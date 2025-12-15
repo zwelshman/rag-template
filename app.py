@@ -12,11 +12,28 @@ import os
 import sys
 import logging
 
-# Configure ChromaDB to use temporary directory on HF Spaces
-# This prevents permission issues when ChromaDB tries to create default directories
+# Configure all libraries to use temporary directories on HF Spaces
+# This prevents permission issues when libraries try to create cache/default directories
 if os.environ.get("SPACE_ID"):
+    # Temporary file directory (critical for file uploads!)
+    os.environ["TMPDIR"] = "/tmp"
+    os.environ["TEMP"] = "/tmp"
+    os.environ["TMP"] = "/tmp"
+
+    # ChromaDB configuration
     os.environ["CHROMA_SQLITE_PATH"] = "/tmp/chroma"
     os.environ["CHROMA_PERSIST_DIRECTORY"] = "/tmp/chroma_persist"
+
+    # Hugging Face/Transformers cache directories
+    os.environ["HF_HOME"] = "/tmp/huggingface"
+    os.environ["TRANSFORMERS_CACHE"] = "/tmp/huggingface/transformers"
+    os.environ["SENTENCE_TRANSFORMERS_HOME"] = "/tmp/sentence-transformers"
+
+    # Torch cache directory
+    os.environ["TORCH_HOME"] = "/tmp/torch"
+
+    # General cache directory
+    os.environ["XDG_CACHE_HOME"] = "/tmp/cache"
 
 from utils import (
     DocumentLoader,
@@ -299,16 +316,24 @@ def render_file_upload():
                 logger.info("DOCUMENT PROCESSING STARTED")
                 logger.info("=" * 60)
 
-                # Prepare file bytes list
-                file_bytes_list = [
-                    (file.getvalue(), file.name)
-                    for file in uploaded_files
-                ]
-
-                for filename in [f.name for f in uploaded_files]:
-                    logger.info(f"Processing file: {filename}")
-
                 try:
+                    # Prepare file bytes list
+                    logger.info("Reading uploaded files...")
+                    file_bytes_list = []
+                    for file in uploaded_files:
+                        try:
+                            file_bytes = file.getvalue()
+                            logger.info(f"  - {file.name}: {len(file_bytes)} bytes")
+                            file_bytes_list.append((file_bytes, file.name))
+                        except Exception as e:
+                            logger.error(f"  - Failed to read {file.name}: {e}")
+                            st.error(f"Failed to read {file.name}: {e}")
+                            return
+
+                    logger.info(f"Successfully read {len(file_bytes_list)} files")
+
+                    # Process documents
+                    logger.info("Adding documents to pipeline...")
                     result = st.session_state.rag_pipeline.add_documents(
                         file_bytes_list=file_bytes_list
                     )
@@ -326,9 +351,20 @@ def render_file_upload():
                     )
                     st.session_state.documents_loaded = True
 
+                except PermissionError as e:
+                    logger.error(f"Permission error during document processing: {e}")
+                    st.error(
+                        f"❌ Permission Error: The app doesn't have permission to write temporary files. "
+                        f"Please contact the Space owner. Error: {e}"
+                    )
                 except Exception as e:
-                    logger.error(f"Document processing failed: {e}")
-                    st.error(f"Error processing documents: {e}")
+                    logger.error(f"Document processing failed: {e}", exc_info=True)
+                    st.error(f"❌ Error processing documents: {type(e).__name__}: {e}")
+                    if "403" in str(e) or "Forbidden" in str(e):
+                        st.error(
+                            "This looks like a permission issue. The app may not have access to "
+                            "write temporary files. Please check the Space logs for more details."
+                        )
 
 
 def render_chat_interface(temperature: float, max_tokens: int):

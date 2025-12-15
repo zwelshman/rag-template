@@ -89,8 +89,11 @@ class DocumentLoader:
         if ext not in self.SUPPORTED_EXTENSIONS:
             raise ValueError(f"Unsupported file type: {ext}")
 
+        # Determine temp directory - use /tmp on HF Spaces or system default
+        temp_dir = os.environ.get("TMPDIR") or os.environ.get("TEMP") or tempfile.gettempdir()
+
         # Write bytes to temporary file and load
-        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext, dir=temp_dir) as tmp_file:
             tmp_file.write(file_bytes)
             tmp_path = tmp_file.name
 
@@ -101,7 +104,11 @@ class DocumentLoader:
                 doc.metadata['source'] = filename
             return documents
         finally:
-            os.unlink(tmp_path)
+            # Clean up temporary file
+            try:
+                os.unlink(tmp_path)
+            except (OSError, PermissionError):
+                pass  # Ignore errors when cleaning up temp file
 
     def _load_text(self, file_path: str) -> List[Document]:
         """Load a plain text file."""
