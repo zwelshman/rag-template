@@ -144,15 +144,8 @@ def render_sidebar():
         st.caption("Using Anthropic's latest model for best results")
 
         # Get API key from secrets or environment
-        default_api_key = get_api_key()
-
-        api_key = st.text_input(
-            "Anthropic API Key",
-            type="password",
-            help="API key loaded from Streamlit secrets or environment variable",
-            value=default_api_key,
-        )
-        if default_api_key:
+        api_key = get_api_key()
+        if api_key:
             st.success("API key auto-loaded from secrets/environment", icon="✅")
 
         # Search Configuration
