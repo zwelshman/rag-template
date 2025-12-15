@@ -1,3 +1,15 @@
+---
+title: RAG Template
+emoji: 📚
+colorFrom: blue
+colorTo: purple
+sdk: streamlit
+sdk_version: "1.28.0"
+app_file: app.py
+pinned: false
+license: mit
+---
+
 # RAG Template
 
 A comprehensive Streamlit application template for demonstrating Retrieval-Augmented Generation (RAG) using ChromaDB for vector search and BM25 for keyword-based search.
@@ -44,6 +56,57 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```bash
 pip install -r requirements.txt
 ```
+
+## Deployment to Hugging Face Spaces
+
+### Quick Deploy
+
+1. **Create a new Space**
+   - Go to [Hugging Face Spaces](https://huggingface.co/spaces)
+   - Click "Create new Space"
+   - Choose "Streamlit" as the SDK
+   - Name your Space and set visibility (public/private)
+
+2. **Upload your code**
+   - Either link your GitHub repository or upload files directly
+   - If using Git, just push this repository to your Space
+
+3. **Add your API key as a Secret**
+   - Go to your Space's Settings
+   - Navigate to "Repository secrets"
+   - Add a new secret:
+     - Name: `ANTHROPIC_API_KEY`
+     - Value: Your Anthropic API key
+   - Click "Save"
+
+4. **Wait for build**
+   - Hugging Face will automatically build and deploy your app
+   - It should be live in a few minutes!
+
+### Important Notes for HF Spaces
+
+- The app is pre-configured for HF Spaces (port 7860, headless mode)
+- API key is automatically loaded from secrets
+- No additional configuration needed!
+- All dependencies are in `requirements.txt`
+
+### Alternative: Deploy via Git
+
+```bash
+# Clone your HF Space repository
+git clone https://huggingface.co/spaces/YOUR_USERNAME/YOUR_SPACE_NAME
+cd YOUR_SPACE_NAME
+
+# Copy this project's files
+cp -r /path/to/rag-template/* .
+
+# Commit and push
+git add .
+git commit -m "Initial deployment"
+git push
+```
+
+Then add the `ANTHROPIC_API_KEY` secret in your Space settings.
 
 ## Usage
 
