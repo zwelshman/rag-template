@@ -175,6 +175,30 @@ git push
 2. **Check the key is valid** at https://console.anthropic.com/
 3. **Restart the Space**: Settings → "Factory reboot"
 
+### 403 Error When Uploading Documents (FIXED)
+
+**Issue**: Getting "AxiosError: Request failed with status code 403" when trying to upload documents.
+
+**Cause**: ChromaDB was trying to write to directories without proper permissions on HF Spaces.
+
+**Solution**: The app now automatically detects HF Spaces and uses in-memory storage. Updates include:
+- Detects `SPACE_ID` environment variable (set by HF Spaces)
+- Uses in-memory ChromaDB client on HF Spaces
+- Falls back to `/tmp` directory for ChromaDB's internal files
+- Gracefully handles permission errors
+
+**What this means**:
+- ✅ Documents can now be uploaded successfully on HF Spaces
+- ⚠️ Data is stored in memory only (not persisted)
+- ⚠️ Documents are cleared when the app restarts or after inactivity
+- ✅ Perfect for demos and testing
+- ✅ No performance impact
+
+**If you still get 403 errors**:
+1. Check Space logs for specific error messages
+2. Verify you have write access to the Space
+3. Try Factory Reboot: Settings → "Factory reboot"
+
 ### Out of memory errors
 
 1. **Reduce chunk processing**:

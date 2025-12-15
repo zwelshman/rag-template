@@ -41,8 +41,18 @@ class VectorStore:
 
         # Initialize ChromaDB client
         if persist_directory:
-            os.makedirs(persist_directory, exist_ok=True)
-            self._client = chromadb.PersistentClient(path=persist_directory)
+            try:
+                os.makedirs(persist_directory, exist_ok=True)
+                self._client = chromadb.PersistentClient(path=persist_directory)
+            except (PermissionError, OSError) as e:
+                # Fallback to in-memory if persistent storage fails
+                import warnings
+                warnings.warn(
+                    f"Failed to create persistent storage at {persist_directory}: {e}. "
+                    "Falling back to in-memory storage.",
+                    RuntimeWarning
+                )
+                self._client = chromadb.Client()
         else:
             self._client = chromadb.Client()
 

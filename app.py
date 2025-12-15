@@ -12,6 +12,12 @@ import os
 import sys
 import logging
 
+# Configure ChromaDB to use temporary directory on HF Spaces
+# This prevents permission issues when ChromaDB tries to create default directories
+if os.environ.get("SPACE_ID"):
+    os.environ["CHROMA_SQLITE_PATH"] = "/tmp/chroma"
+    os.environ["CHROMA_PERSIST_DIRECTORY"] = "/tmp/chroma_persist"
+
 from utils import (
     DocumentLoader,
     RAGPipeline,
@@ -109,6 +115,16 @@ def create_pipeline(
     logger.info(f"Chunk Overlap: {chunk_overlap}")
     logger.info(f"Number of Results: {n_results}")
 
+    # Detect if running on HF Spaces and use in-memory storage
+    # HF Spaces has limited persistent storage, so we use ephemeral storage
+    persist_dir = None
+    if os.environ.get("SPACE_ID"):
+        logger.info("Running on Hugging Face Spaces - using in-memory storage")
+        persist_dir = None  # Force in-memory mode on HF Spaces
+    else:
+        logger.info("Running locally - using persistent storage")
+        persist_dir = "./data/chroma_db"
+
     mode_map = {
         "Vector (Semantic)": SearchMode.VECTOR,
         "BM25 (Keyword)": SearchMode.BM25,
@@ -123,6 +139,7 @@ def create_pipeline(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         n_results=n_results,
+        persist_directory=persist_dir,
     )
 
     logger.info("RAG Pipeline created successfully")
@@ -249,6 +266,14 @@ def render_sidebar():
 def render_file_upload():
     """Render the file upload section."""
     st.header("Document Upload")
+
+    # Show storage mode warning on HF Spaces
+    if os.environ.get("SPACE_ID"):
+        st.info(
+            "ℹ️ **Running on Hugging Face Spaces**: Documents are stored in memory only. "
+            "They will be cleared when the app restarts or after inactivity.",
+            icon="ℹ️"
+        )
 
     # Supported file types
     supported_types = DocumentLoader.get_supported_extensions()
