@@ -6,9 +6,11 @@ Handles loading and extracting text from various file formats:
 - Word documents (.docx)
 - Excel files (.xlsx, .xls)
 - CSV files (.csv)
+- JSON files (.json)
 """
 
 import os
+import json
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 import pandas as pd
@@ -36,6 +38,7 @@ class DocumentLoader:
         '.xlsx': 'excel',
         '.xls': 'excel',
         '.csv': 'csv',
+        '.json': 'json',
     }
 
     def __init__(self):
@@ -45,6 +48,7 @@ class DocumentLoader:
             'word': self._load_word,
             'excel': self._load_excel,
             'csv': self._load_csv,
+            'json': self._load_json,
         }
 
     def load(self, file_path: str) -> List[Document]:
@@ -247,6 +251,23 @@ class DocumentLoader:
             }
         )]
 
+    def _load_json(self, file_path: str) -> List[Document]:
+        """Load a JSON file."""
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        # Convert JSON to readable text format
+        content = self._json_to_text(data)
+
+        return [Document(
+            content=content,
+            metadata={
+                'source': os.path.basename(file_path),
+                'file_type': 'json',
+                'file_path': file_path,
+            }
+        )]
+
     def _dataframe_to_text(self, df: pd.DataFrame, sheet_name: Optional[str] = None) -> str:
         """Convert a DataFrame to readable text format."""
         lines = []
@@ -268,6 +289,30 @@ class DocumentLoader:
                     row_parts.append(f"{col}: {value}")
             if row_parts:
                 lines.append(f"Row {idx + 1}: " + " | ".join(row_parts))
+
+        return '\n'.join(lines)
+
+    def _json_to_text(self, data: Any, indent: int = 0) -> str:
+        """Convert JSON data to readable text format."""
+        lines = []
+        indent_str = "  " * indent
+
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if isinstance(value, (dict, list)):
+                    lines.append(f"{indent_str}{key}:")
+                    lines.append(self._json_to_text(value, indent + 1))
+                else:
+                    lines.append(f"{indent_str}{key}: {value}")
+        elif isinstance(data, list):
+            for idx, item in enumerate(data):
+                if isinstance(item, (dict, list)):
+                    lines.append(f"{indent_str}[{idx}]:")
+                    lines.append(self._json_to_text(item, indent + 1))
+                else:
+                    lines.append(f"{indent_str}[{idx}]: {item}")
+        else:
+            lines.append(f"{indent_str}{data}")
 
         return '\n'.join(lines)
 
