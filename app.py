@@ -103,7 +103,7 @@ def create_pipeline(
     logger.info("CREATING NEW RAG PIPELINE")
     logger.info("=" * 60)
     logger.info(f"Provider: Anthropic")
-    logger.info(f"Model: claude-sonnet-4-5-20241022")
+    logger.info(f"Model: claude-sonnet-4-5")
     logger.info(f"Search Mode: {search_mode}")
     logger.info(f"Chunk Size: {chunk_size}")
     logger.info(f"Chunk Overlap: {chunk_overlap}")
@@ -118,7 +118,7 @@ def create_pipeline(
     pipeline = RAGPipeline(
         llm_provider="anthropic",
         llm_api_key=api_key,
-        llm_model="claude-sonnet-4-5-20241022",
+        llm_model="claude-sonnet-4-5",
         search_mode=mode_map.get(search_mode, SearchMode.HYBRID),
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
