@@ -83,6 +83,9 @@ class DocumentLoader:
             List of Document objects
         """
         import tempfile
+        import logging
+
+        logger = logging.getLogger("rag_app.document_loader")
 
         ext = os.path.splitext(filename)[1].lower()
 
@@ -91,24 +94,38 @@ class DocumentLoader:
 
         # Determine temp directory - use /tmp on HF Spaces or system default
         temp_dir = os.environ.get("TMPDIR") or os.environ.get("TEMP") or tempfile.gettempdir()
+        logger.info(f"Using temp directory: {temp_dir}")
 
         # Write bytes to temporary file and load
-        with tempfile.NamedTemporaryFile(delete=False, suffix=ext, dir=temp_dir) as tmp_file:
-            tmp_file.write(file_bytes)
-            tmp_path = tmp_file.name
+        try:
+            logger.info(f"Creating temporary file for {filename} ({len(file_bytes)} bytes)")
+            with tempfile.NamedTemporaryFile(delete=False, suffix=ext, dir=temp_dir) as tmp_file:
+                tmp_file.write(file_bytes)
+                tmp_path = tmp_file.name
+            logger.info(f"Temporary file created: {tmp_path}")
+        except Exception as e:
+            logger.error(f"Failed to create temporary file in {temp_dir}: {e}", exc_info=True)
+            raise RuntimeError(f"Failed to create temporary file: {e}") from e
 
         try:
+            logger.info(f"Loading document from temp file: {tmp_path}")
             documents = self.load(tmp_path)
+            logger.info(f"Successfully loaded {len(documents)} document(s) from {filename}")
             # Update metadata with original filename
             for doc in documents:
                 doc.metadata['source'] = filename
             return documents
+        except Exception as e:
+            logger.error(f"Failed to load document from {tmp_path}: {e}", exc_info=True)
+            raise
         finally:
             # Clean up temporary file
             try:
-                os.unlink(tmp_path)
-            except (OSError, PermissionError):
-                pass  # Ignore errors when cleaning up temp file
+                if 'tmp_path' in locals():
+                    os.unlink(tmp_path)
+                    logger.info(f"Cleaned up temporary file: {tmp_path}")
+            except (OSError, PermissionError) as e:
+                logger.warning(f"Could not delete temporary file {tmp_path}: {e}")
 
     def _load_text(self, file_path: str) -> List[Document]:
         """Load a plain text file."""

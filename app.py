@@ -305,6 +305,15 @@ def render_file_upload():
 
     if uploaded_files:
         logger.info(f"Files selected for upload: {[f.name for f in uploaded_files]}")
+
+        # Log file metadata BEFORE processing to debug upload issues
+        try:
+            for f in uploaded_files:
+                logger.info(f"File metadata - name: {f.name}, type: {f.type}, size: {f.size if hasattr(f, 'size') else 'unknown'}")
+        except Exception as e:
+            logger.error(f"Error reading file metadata: {e}", exc_info=True)
+            st.error(f"❌ Error accessing uploaded files: {e}")
+
         if st.button("Process Documents", type="primary"):
             if not st.session_state.rag_pipeline:
                 logger.warning("Process Documents clicked but pipeline not initialized")
@@ -320,14 +329,16 @@ def render_file_upload():
                     # Prepare file bytes list
                     logger.info("Reading uploaded files...")
                     file_bytes_list = []
-                    for file in uploaded_files:
+                    for idx, file in enumerate(uploaded_files):
                         try:
+                            logger.info(f"Reading file {idx + 1}/{len(uploaded_files)}: {file.name}")
                             file_bytes = file.getvalue()
-                            logger.info(f"  - {file.name}: {len(file_bytes)} bytes")
+                            logger.info(f"  ✓ Successfully read {file.name}: {len(file_bytes)} bytes ({len(file_bytes)/1024:.2f} KB)")
                             file_bytes_list.append((file_bytes, file.name))
                         except Exception as e:
-                            logger.error(f"  - Failed to read {file.name}: {e}")
-                            st.error(f"Failed to read {file.name}: {e}")
+                            logger.error(f"  ✗ Failed to read {file.name}: {type(e).__name__}: {e}", exc_info=True)
+                            st.error(f"❌ Failed to read {file.name}: {type(e).__name__}: {e}")
+                            st.error(f"Full error details logged. Check the Space logs for more information.")
                             return
 
                     logger.info(f"Successfully read {len(file_bytes_list)} files")
