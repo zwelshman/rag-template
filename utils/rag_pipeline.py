@@ -2,17 +2,23 @@
 RAG Pipeline Module
 Combines document loading, chunking, indexing, retrieval, and generation
 into a unified pipeline for Retrieval-Augmented Generation.
+Uses Anthropic Claude Sonnet 4.5 for LLM generation.
 """
 
 from typing import List, Dict, Any, Optional, Generator
 from dataclasses import dataclass
 from enum import Enum
+import logging
 
 from .document_loader import DocumentLoader, Document
 from .text_splitter import TextSplitter, TextChunk
 from .vector_store import VectorStore
 from .bm25_search import BM25Search, HybridSearch
 from .llm import LLMClient
+
+# Configure logger for this module
+logger = logging.getLogger("rag_app.pipeline")
+logger.setLevel(logging.INFO)
 
 
 class SearchMode(Enum):
@@ -62,7 +68,7 @@ in the provided documents."""
 
     def __init__(
         self,
-        llm_provider: str = "openai",
+        llm_provider: str = "anthropic",
         llm_api_key: Optional[str] = None,
         llm_model: Optional[str] = None,
         collection_name: str = "rag_documents",
@@ -88,6 +94,16 @@ in the provided documents."""
             search_mode: Search mode (vector, bm25, or hybrid)
             n_results: Number of results to retrieve
         """
+        logger.info("Initializing RAG Pipeline...")
+        logger.info(f"  LLM Provider: {llm_provider}")
+        logger.info(f"  LLM Model: {llm_model or 'default'}")
+        logger.info(f"  Collection: {collection_name}")
+        logger.info(f"  Embedding Model: {embedding_model}")
+        logger.info(f"  Chunk Size: {chunk_size}")
+        logger.info(f"  Chunk Overlap: {chunk_overlap}")
+        logger.info(f"  Search Mode: {search_mode.value}")
+        logger.info(f"  N Results: {n_results}")
+
         # Store configuration
         self.search_mode = search_mode
         self.n_results = n_results
@@ -95,17 +111,26 @@ in the provided documents."""
         self.chunk_overlap = chunk_overlap
 
         # Initialize components
+        logger.info("Initializing document loader...")
         self.document_loader = DocumentLoader()
+
+        logger.info("Initializing text splitter...")
         self.text_splitter = TextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
         )
+
+        logger.info("Initializing vector store (ChromaDB)...")
         self.vector_store = VectorStore(
             collection_name=collection_name,
             persist_directory=persist_directory,
             embedding_model=embedding_model,
         )
+
+        logger.info("Initializing BM25 search...")
         self.bm25_search = BM25Search()
+
+        logger.info("Initializing hybrid search...")
         self.hybrid_search = HybridSearch(
             vector_store=self.vector_store,
             bm25_search=self.bm25_search,
@@ -123,14 +148,18 @@ in the provided documents."""
         self.system_prompt = self.DEFAULT_SYSTEM_PROMPT
         self.rag_prompt_template = self.DEFAULT_RAG_PROMPT_TEMPLATE
 
+        logger.info("RAG Pipeline initialization complete")
+
     def _get_llm(self) -> LLMClient:
         """Get or create LLM client."""
         if self._llm is None:
+            logger.info("Creating LLM client on first use...")
             self._llm = LLMClient(
                 provider=self._llm_config['provider'],
                 api_key=self._llm_config['api_key'],
                 model=self._llm_config['model'],
             )
+            logger.info("LLM client created successfully")
         return self._llm
 
     def set_llm(
@@ -169,35 +198,54 @@ in the provided documents."""
         Returns:
             Summary of added documents
         """
+        logger.info("Adding documents to RAG pipeline...")
         all_documents = []
 
         # Load from file paths
         if file_paths:
+            logger.info(f"Loading {len(file_paths)} files from paths...")
             for path in file_paths:
                 try:
+                    logger.info(f"  Loading: {path}")
                     docs = self.document_loader.load(path)
                     all_documents.extend(docs)
+                    logger.info(f"    Loaded {len(docs)} document(s)")
                 except Exception as e:
-                    print(f"Error loading {path}: {e}")
+                    logger.error(f"  Error loading {path}: {e}")
 
         # Load from bytes
         if file_bytes_list:
+            logger.info(f"Loading {len(file_bytes_list)} files from bytes...")
             for file_bytes, filename in file_bytes_list:
                 try:
+                    logger.info(f"  Loading: {filename}")
                     docs = self.document_loader.load_from_bytes(file_bytes, filename)
                     all_documents.extend(docs)
+                    logger.info(f"    Loaded {len(docs)} document(s)")
                 except Exception as e:
-                    print(f"Error loading {filename}: {e}")
+                    logger.error(f"  Error loading {filename}: {e}")
 
         if not all_documents:
+            logger.warning("No documents were loaded successfully")
             return {'documents': 0, 'chunks': 0}
 
+        logger.info(f"Total documents loaded: {len(all_documents)}")
+
         # Split into chunks
+        logger.info("Splitting documents into chunks...")
         chunks = self.text_splitter.split_documents(all_documents)
+        logger.info(f"Created {len(chunks)} chunks")
 
         # Add to both vector store and BM25 index
+        logger.info("Adding chunks to vector store...")
         num_vector = self.vector_store.add_documents(chunks)
+        logger.info(f"Vector store now contains {num_vector} documents")
+
+        logger.info("Adding chunks to BM25 index...")
         num_bm25 = self.bm25_search.add_documents(chunks)
+        logger.info(f"BM25 index now contains {num_bm25} documents")
+
+        logger.info("Document indexing complete")
 
         return {
             'documents': len(all_documents),
@@ -226,12 +274,22 @@ in the provided documents."""
         mode = mode or self.search_mode
         n_results = n_results or self.n_results
 
+        logger.info(f"Searching for: '{query[:50]}{'...' if len(query) > 50 else ''}'")
+        logger.info(f"  Mode: {mode.value}")
+        logger.info(f"  Requested results: {n_results}")
+
         if mode == SearchMode.VECTOR:
-            return self.vector_store.search(query, n_results=n_results)
+            logger.info("  Using vector (semantic) search...")
+            results = self.vector_store.search(query, n_results=n_results)
         elif mode == SearchMode.BM25:
-            return self.bm25_search.search(query, n_results=n_results)
+            logger.info("  Using BM25 (keyword) search...")
+            results = self.bm25_search.search(query, n_results=n_results)
         else:  # HYBRID
-            return self.hybrid_search.search(query, n_results=n_results)
+            logger.info("  Using hybrid (vector + BM25) search...")
+            results = self.hybrid_search.search(query, n_results=n_results)
+
+        logger.info(f"  Found {len(results)} results")
+        return results
 
     def _format_context(self, results: List[Dict[str, Any]]) -> str:
         """Format search results into context for the LLM."""
@@ -274,10 +332,14 @@ in the provided documents."""
         Returns:
             RAGResponse with answer and sources
         """
+        logger.info("Processing RAG query (non-streaming)...")
+        logger.info(f"  Question: {question[:80]}{'...' if len(question) > 80 else ''}")
+
         # Search for relevant documents
         results = self.search(question, mode=mode, n_results=n_results)
 
         if not results:
+            logger.warning("No relevant documents found for query")
             return RAGResponse(
                 answer="I couldn't find any relevant information in the documents to answer your question.",
                 sources=[],
@@ -286,7 +348,9 @@ in the provided documents."""
             )
 
         # Format context
+        logger.info("Formatting context from search results...")
         context = self._format_context(results)
+        logger.info(f"  Context length: {len(context)} chars")
 
         # Create prompt
         prompt = self.rag_prompt_template.format(
@@ -295,6 +359,7 @@ in the provided documents."""
         )
 
         # Generate answer
+        logger.info("Generating answer with LLM...")
         llm = self._get_llm()
         answer = llm.generate(
             prompt=prompt,
@@ -302,6 +367,8 @@ in the provided documents."""
             temperature=temperature,
             max_tokens=max_tokens,
         )
+
+        logger.info(f"Answer generated: {len(answer)} chars")
 
         return RAGResponse(
             answer=answer,
@@ -331,15 +398,21 @@ in the provided documents."""
         Yields:
             Tokens from the LLM response
         """
+        logger.info("Processing RAG query (streaming)...")
+        logger.info(f"  Question: {question[:80]}{'...' if len(question) > 80 else ''}")
+
         # Search for relevant documents
         results = self.search(question, mode=mode, n_results=n_results)
 
         if not results:
+            logger.warning("No relevant documents found for query")
             yield "I couldn't find any relevant information in the documents to answer your question."
             return
 
         # Format context
+        logger.info("Formatting context from search results...")
         context = self._format_context(results)
+        logger.info(f"  Context length: {len(context)} chars")
 
         # Create prompt
         prompt = self.rag_prompt_template.format(
@@ -348,6 +421,7 @@ in the provided documents."""
         )
 
         # Generate streaming answer
+        logger.info("Starting streaming response from LLM...")
         llm = self._get_llm()
         for token in llm.generate_stream(
             prompt=prompt,
@@ -356,11 +430,16 @@ in the provided documents."""
             max_tokens=max_tokens,
         ):
             yield token
+        logger.info("Streaming response complete")
 
     def clear(self) -> None:
         """Clear all documents from the pipeline."""
+        logger.info("Clearing all documents from pipeline...")
         self.vector_store.clear()
+        logger.info("  Vector store cleared")
         self.bm25_search.clear()
+        logger.info("  BM25 index cleared")
+        logger.info("Pipeline cleared successfully")
 
     def get_stats(self) -> Dict[str, Any]:
         """Get pipeline statistics."""
