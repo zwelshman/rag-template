@@ -1,90 +1,108 @@
-# RAG Template
+# 📚 Streamlit RAG Kit
 
-A comprehensive Streamlit application template for demonstrating Retrieval-Augmented Generation (RAG) using ChromaDB for vector search and BM25 for keyword-based search.
+A production-ready, modular Retrieval-Augmented Generation (RAG) application powered by **Claude Sonnet 4.5**, built with Streamlit.
 
-## Features
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-- **Multiple File Format Support**
-  - Text files (.txt)
-  - PDF documents (.pdf)
-  - Word documents (.docx)
-  - Excel spreadsheets (.xlsx, .xls)
-  - CSV files (.csv)
+## ✨ Features
 
-- **Hybrid Search**
-  - **Vector Search**: Semantic similarity using sentence transformers and ChromaDB
-  - **BM25 Search**: Traditional keyword-based retrieval
-  - **Hybrid Search**: Combines both methods using Reciprocal Rank Fusion (RRF)
+- 🚀 **Production-Ready**: Modular architecture with separation of concerns
+- 🧠 **Powered by Claude Sonnet 4.5**: State-of-the-art LLM for generation
+- 📁 **Multi-Format Support**: PDF, DOCX, TXT, CSV, XLSX, JSON
+- 🔍 **Hybrid Search**: Combines vector similarity and BM25 keyword search
+- 💬 **Streaming Responses**: Real-time response generation
+- 📊 **Source Citations**: View which documents informed each answer
+- 🎨 **Clean UI**: Intuitive Streamlit interface
+- 🔧 **Highly Configurable**: Adjust chunk size, search mode, and LLM parameters
+- 📦 **Easy Deployment**: Deploy to Streamlit Cloud, Docker, or any cloud platform
 
-- **LLM Integration**
-  - OpenAI (GPT-4o, GPT-4, GPT-3.5-turbo)
-  - Anthropic Claude (Claude 3.5 Sonnet, Claude 3 Opus, etc.)
-  - Streaming responses
+## 🏗️ Architecture
 
-- **Configurable Pipeline**
-  - Adjustable chunk size and overlap
-  - Configurable number of retrieved results
-  - Temperature and max tokens control
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd rag-template
+```
+streamlit-rag-kit/
+├── 🎯 app.py                          # Main Streamlit app
+├── 📋 requirements.txt                # Dependencies
+├── 📁 components/                     # UI Components
+│   ├── file_uploader.py              # Document upload UI
+│   ├── chat_interface.py             # Chat UI
+│   ├── settings_panel.py             # Configuration panel
+│   └── citation_viewer.py            # Source display
+├── 📁 core/                           # Core RAG Engine
+│   ├── vector_stores/                # Vector DB implementations
+│   │   ├── base.py                   # Base interface
+│   │   └── chroma.py                 # ChromaDB (default)
+│   ├── llm_providers/                # LLM integrations
+│   │   ├── base.py                   # Base interface
+│   │   ├── anthropic_provider.py     # Anthropic (default)
+│   │   ├── openai_provider.py        # OpenAI support
+│   │   └── factory.py                # Provider factory
+│   ├── document_processor.py         # Document loading & chunking
+│   └── retrieval_engine.py           # Main RAG pipeline
+├── 📁 prompts/                        # Prompt templates
+│   ├── default_system.txt
+│   ├── detailed_analysis.txt
+│   └── concise_summary.txt
+├── 📁 utils/                          # Utilities
+│   ├── auth.py                       # API key management
+│   ├── session_state.py              # State management
+│   ├── cost_tracking.py              # Usage tracking
+│   └── bm25_search.py                # BM25 implementation
+├── 📁 deployment/                     # Deployment configs
+│   ├── streamlit_cloud_guide.md
+│   ├── docker-compose.yml
+│   └── Dockerfile
+├── 📁 docs/                           # Documentation
+│   ├── quick_start.md
+│   └── api_key_setup.md
+└── 📁 .streamlit/
+    ├── config.toml                   # App configuration
+    └── secrets.toml.example          # API key template
 ```
 
-2. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+## 🚀 Quick Start
 
-3. Install dependencies:
+### 1. Installation
+
 ```bash
+# Clone the repository
+git clone <your-repo-url>
+cd streamlit-rag-kit
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-## Usage
+### 2. Set Up API Key
 
-### Running the Streamlit App
+Create `.streamlit/secrets.toml`:
+
+```toml
+ANTHROPIC_API_KEY = "sk-ant-your-api-key-here"
+```
+
+Get your API key from [Anthropic Console](https://console.anthropic.com/).
+
+### 3. Run the App
 
 ```bash
 streamlit run app.py
 ```
 
-The app will open in your browser at `http://localhost:8501`.
+The app will open at `http://localhost:8501`.
 
-### Using the App
+### 4. Use the App
 
-1. **Configure the Pipeline** (Sidebar)
-   - Select your LLM provider (OpenAI or Anthropic)
-   - Choose a model
-   - Enter your API key
-   - Adjust search and chunking settings
-   - Click "Initialize Pipeline"
+1. **Initialize Pipeline**: Click "Initialize Pipeline" in the sidebar
+2. **Upload Documents**: Upload your files (PDF, DOCX, TXT, etc.)
+3. **Ask Questions**: Start chatting with your documents!
 
-2. **Upload Documents** (Tab 1)
-   - Upload one or more supported documents
-   - Click "Process Documents" to index them
+## 📖 Documentation
 
-3. **Ask Questions** (Tab 2)
-   - Type your question in the chat input
-   - View the AI-generated answer with source citations
-   - Expand "View Sources" to see the retrieved context
-
-4. **Search Demo** (Tab 3)
-   - Test different search modes directly
-   - Compare vector, BM25, and hybrid search results
-
-### Environment Variables
-
-You can set API keys as environment variables:
-
-```bash
-export OPENAI_API_KEY="your-openai-key"
-export ANTHROPIC_API_KEY="your-anthropic-key"
-```
+- [📚 Quick Start Guide](docs/quick_start.md) - Get started in 5 minutes
+- [🔑 API Key Setup](docs/api_key_setup.md) - Configure API keys
+- [🚀 Deployment Guide](deployment/streamlit_cloud_guide.md) - Deploy to production
 
 ## Project Structure
 
@@ -179,6 +197,35 @@ Combines both methods using Reciprocal Rank Fusion. Benefits:
 - **openai**: OpenAI API client
 - **anthropic**: Anthropic API client
 
-## License
+## 🎯 Use Cases
+
+- 📄 **Document Q&A**: Ask questions about your documents
+- 🔍 **Research Assistant**: Search through research papers
+- 📚 **Knowledge Base**: Build a searchable knowledge base
+- 💼 **Business Intelligence**: Query business documents
+- 📖 **Study Aid**: Interact with textbooks and notes
+
+## 🚀 Deployment
+
+### Streamlit Cloud (Easiest)
+
+1. Push to GitHub
+2. Connect to [Streamlit Cloud](https://share.streamlit.io)
+3. Add API key in Secrets
+4. Deploy!
+
+See [Deployment Guide](deployment/streamlit_cloud_guide.md) for details.
+
+### Docker
+
+```bash
+docker-compose up
+```
+
+## 📝 License
 
 MIT License
+
+---
+
+Made with ❤️ using Claude Sonnet 4.5
