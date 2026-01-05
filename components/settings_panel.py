@@ -25,14 +25,16 @@ def render_sidebar() -> Tuple[float, int]:
         # LLM Configuration
         st.subheader("LLM Settings")
 
-        # Fixed to Anthropic with Sonnet 4.5
-        st.info("**Model:** Claude Sonnet 4.5")
-        st.caption("Using Anthropic's latest model for best results")
+        # Demo version: OpenAI only
+        st.info("**Model:** GPT-4o (OpenAI)")
+        st.caption("Demo version uses OpenAI's GPT-4o model")
 
         # Get API key from secrets or environment
-        api_key = get_api_key()
+        api_key = get_api_key("OPENAI_API_KEY")
         if api_key:
-            st.success("API key auto-loaded from secrets/environment", icon="✅")
+            st.success("OpenAI API key loaded", icon="✅")
+        else:
+            st.warning("⚠️ Please add your OpenAI API key to `.streamlit/secrets.toml`", icon="⚠️")
 
         # Search Configuration
         st.subheader("Search Settings")
@@ -99,7 +101,7 @@ def render_sidebar() -> Tuple[float, int]:
             logger.info("Initialize Pipeline button clicked")
             if not api_key:
                 logger.warning("Pipeline initialization failed: No API key provided")
-                st.error("Please enter your Anthropic API key")
+                st.error("Please enter your OpenAI API key")
             else:
                 try:
                     with st.spinner("Initializing pipeline..."):
@@ -115,7 +117,7 @@ def render_sidebar() -> Tuple[float, int]:
                         st.session_state.llm_configured = True
                         st.session_state.temperature = temperature
                         st.session_state.max_tokens = max_tokens
-                    st.success("Pipeline initialized with Claude Sonnet 4.5!")
+                    st.success("Pipeline initialized with GPT-4o!")
                     logger.info("Pipeline initialization complete - ready for documents")
                 except Exception as e:
                     logger.error(f"Pipeline initialization failed: {e}")

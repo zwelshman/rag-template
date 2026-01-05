@@ -10,31 +10,34 @@ import logging
 logger = logging.getLogger("rag_app.utils.auth")
 
 
-def get_api_key() -> str:
+def get_api_key(key_name: str = "ANTHROPIC_API_KEY") -> str:
     """
-    Get Anthropic API key from Streamlit secrets or environment variable.
+    Get API key from Streamlit secrets or environment variable.
 
     Priority:
-    1. Streamlit secrets (st.secrets["ANTHROPIC_API_KEY"])
-    2. Environment variable (ANTHROPIC_API_KEY)
+    1. Streamlit secrets (st.secrets[key_name])
+    2. Environment variable (key_name)
+
+    Args:
+        key_name: Name of the API key to retrieve (default: ANTHROPIC_API_KEY)
 
     Returns:
         API key string or empty string if not found
     """
     # Try Streamlit secrets first
     try:
-        if "ANTHROPIC_API_KEY" in st.secrets:
-            logger.info("API key found in Streamlit secrets")
-            return st.secrets["ANTHROPIC_API_KEY"]
+        if key_name in st.secrets:
+            logger.info(f"{key_name} found in Streamlit secrets")
+            return st.secrets[key_name]
     except Exception as e:
         logger.debug(f"Could not read Streamlit secrets: {e}")
 
     # Fall back to environment variable
-    env_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    env_key = os.environ.get(key_name, "")
     if env_key:
-        logger.info("API key found in environment variable")
+        logger.info(f"{key_name} found in environment variable")
     else:
-        logger.warning("No API key found in secrets or environment")
+        logger.warning(f"No {key_name} found in secrets or environment")
     return env_key
 
 

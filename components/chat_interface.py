@@ -20,6 +20,17 @@ def render_chat_interface(temperature: float = 0.7, max_tokens: int = 1000):
     """
     st.header("Ask Questions")
 
+    # Demo version: limit to 10 queries
+    MAX_QUERIES = 10
+    query_count = st.session_state.get('query_count', 0)
+    remaining_queries = MAX_QUERIES - query_count
+
+    if remaining_queries <= 0:
+        st.warning(f"⚠️ Demo limit reached: You have used all {MAX_QUERIES} queries for this session. Please refresh the page to start a new session.")
+        return
+
+    st.info(f"💬 Demo Version: {remaining_queries} of {MAX_QUERIES} queries remaining")
+
     if not st.session_state.get('rag_pipeline'):
         st.info("Please initialize the pipeline in the sidebar to start asking questions.")
         return
@@ -107,6 +118,9 @@ def render_chat_interface(temperature: float = 0.7, max_tokens: int = 1000):
                         "content": full_response,
                         "sources": sources,
                     })
+
+                    # Increment query count
+                    st.session_state.query_count += 1
 
                 except Exception as e:
                     logger.error(f"Query failed: {e}")

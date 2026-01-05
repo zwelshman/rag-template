@@ -29,6 +29,15 @@ def init_session_state():
         st.session_state.llm_configured = False
         logger.debug("Session state: llm_configured initialized to False")
 
+    # Demo version limits
+    if 'document_count' not in st.session_state:
+        st.session_state.document_count = 0
+        logger.debug("Session state: document_count initialized to 0")
+
+    if 'query_count' not in st.session_state:
+        st.session_state.query_count = 0
+        logger.debug("Session state: query_count initialized to 0")
+
 
 def clear_chat_history():
     """Clear the chat history."""
@@ -42,6 +51,7 @@ def clear_documents():
     if st.session_state.get('rag_pipeline'):
         st.session_state.rag_pipeline.clear()
     st.session_state.documents_loaded = False
+    st.session_state.document_count = 0
 
 
 def reset_session():
