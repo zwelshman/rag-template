@@ -50,7 +50,7 @@ def render_sidebar() -> Tuple[float, int]:
             "Number of Results",
             min_value=1,
             max_value=20,
-            value=5,
+            value=20,
             help="Number of document chunks to retrieve",
         )
 
@@ -61,7 +61,7 @@ def render_sidebar() -> Tuple[float, int]:
             "Chunk Size",
             min_value=200,
             max_value=2000,
-            value=1000,
+            value=300,
             step=100,
             help="Maximum size of each text chunk",
         )
@@ -70,7 +70,7 @@ def render_sidebar() -> Tuple[float, int]:
             "Chunk Overlap",
             min_value=0,
             max_value=500,
-            value=200,
+            value=50,
             step=50,
             help="Overlap between consecutive chunks",
         )
@@ -91,7 +91,7 @@ def render_sidebar() -> Tuple[float, int]:
             "Max Tokens",
             min_value=100,
             max_value=4000,
-            value=1000,
+            value=2000,
             step=100,
             help="Maximum tokens in the response",
         )
