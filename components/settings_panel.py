@@ -25,14 +25,16 @@ def render_sidebar() -> Tuple[float, int]:
         # LLM Configuration
         st.subheader("LLM Settings")
 
-        # Fixed to Anthropic with Sonnet 4.5
-        st.info("**Model:** Claude Sonnet 4.5")
-        st.caption("Using Anthropic's latest model for best results")
+        # Demo version: Anthropic only
+        st.info("**Model:** Claude Sonnet 4.5 (Anthropic)")
+        st.caption("Demo version uses Anthropic's Claude Sonnet 4.5 model")
 
         # Get API key from secrets or environment
-        api_key = get_api_key()
+        api_key = get_api_key("ANTHROPIC_API_KEY")
         if api_key:
-            st.success("API key auto-loaded from secrets/environment", icon="✅")
+            st.success("Anthropic API key loaded", icon="✅")
+        else:
+            st.warning("⚠️ Please add your Anthropic API key to `.streamlit/secrets.toml`", icon="⚠️")
 
         # Search Configuration
         st.subheader("Search Settings")
@@ -48,7 +50,7 @@ def render_sidebar() -> Tuple[float, int]:
             "Number of Results",
             min_value=1,
             max_value=20,
-            value=5,
+            value=20,
             help="Number of document chunks to retrieve",
         )
 
@@ -59,7 +61,7 @@ def render_sidebar() -> Tuple[float, int]:
             "Chunk Size",
             min_value=200,
             max_value=2000,
-            value=1000,
+            value=300,
             step=100,
             help="Maximum size of each text chunk",
         )
@@ -68,7 +70,7 @@ def render_sidebar() -> Tuple[float, int]:
             "Chunk Overlap",
             min_value=0,
             max_value=500,
-            value=200,
+            value=50,
             step=50,
             help="Overlap between consecutive chunks",
         )
@@ -89,7 +91,7 @@ def render_sidebar() -> Tuple[float, int]:
             "Max Tokens",
             min_value=100,
             max_value=4000,
-            value=1000,
+            value=2000,
             step=100,
             help="Maximum tokens in the response",
         )

@@ -354,7 +354,7 @@ def create_pipeline(
     n_results: int,
 ) -> RAGPipeline:
     """
-    Create a new RAG pipeline with Anthropic Claude Sonnet 4.5.
+    Create a new RAG pipeline with Anthropic Claude Sonnet 4.5 (Demo version).
 
     Args:
         api_key: Anthropic API key
@@ -367,7 +367,7 @@ def create_pipeline(
         Initialized RAGPipeline
     """
     logger.info("=" * 60)
-    logger.info("CREATING NEW RAG PIPELINE")
+    logger.info("CREATING NEW RAG PIPELINE (DEMO VERSION)")
     logger.info("=" * 60)
     logger.info(f"Provider: Anthropic")
     logger.info(f"Model: claude-sonnet-4-5")
@@ -392,7 +392,7 @@ def create_pipeline(
         n_results=n_results,
     )
 
-    logger.info("RAG Pipeline created successfully")
+    logger.info("RAG Pipeline created successfully (Demo Version)")
     logger.info("=" * 60)
 
     return pipeline

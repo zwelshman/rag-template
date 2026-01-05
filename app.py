@@ -31,7 +31,7 @@ logger.setLevel(logging.INFO)
 
 # Page configuration
 st.set_page_config(
-    page_title="Streamlit RAG Kit",
+    page_title="RAG Starter Kit - Demo",
     page_icon="📚",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -40,77 +40,68 @@ st.set_page_config(
 
 def render_instructions():
     """Render step-by-step instructions for using the app."""
-    with st.expander("How to Use This App (Step-by-Step Guide)", expanded=False):
+    with st.expander("How to Use This Demo (Step-by-Step Guide)", expanded=False):
         st.markdown("""
-### Getting Started with Streamlit RAG Kit
+### Getting Started with RAG Starter Kit Demo
 
-Follow these steps to use the Retrieval-Augmented Generation (RAG) system:
+Follow these steps to try out the RAG (Retrieval-Augmented Generation) system:
+
+---
+
+#### 🎯 Demo Limitations
+- **3 documents** maximum per session
+- **10 queries** maximum per session
+- **ChromaDB** vector store (local, no cloud services)
+- **Anthropic Claude Sonnet 4.5** model only
+- Basic chat interface
 
 ---
 
 #### Step 1: Configure Your API Key
 1. Look at the **sidebar on the left**
-2. Your Anthropic API key should be auto-loaded from Streamlit secrets
-3. If not, add it to `.streamlit/secrets.toml`
-4. Click **"Initialize Pipeline"** to start the system
+2. Add your Anthropic API key to `.streamlit/secrets.toml`
+3. Click **"Initialize Pipeline"** to start the system
 
-> **Tip:** To set up Streamlit secrets, create a file at `.streamlit/secrets.toml` with:
+> **Tip:** Create a file at `.streamlit/secrets.toml` with:
 > ```toml
-> ANTHROPIC_API_KEY = "your-api-key-here"
+> ANTHROPIC_API_KEY = "sk-ant-your-anthropic-api-key-here"
 > ```
 
 ---
 
-#### Step 2: Upload Your Documents
+#### Step 2: Upload Your Documents (Max 3)
 1. Go to the **"Upload Documents"** tab
 2. Click **"Browse files"** to select your documents
 3. Supported formats: TXT, PDF, DOCX, XLSX, CSV, JSON
-4. Select one or multiple files
+4. Upload up to 3 documents total
 5. Click **"Process Documents"** to index them
-
-> **What happens:** Your documents are split into chunks, embedded using AI, and stored in a vector database for fast retrieval.
 
 ---
 
-#### Step 3: Ask Questions
+#### Step 3: Ask Questions (Max 10)
 1. Go to the **"Ask Questions"** tab
-2. Type your question in the chat input at the bottom
-3. The system will:
-   - Search your documents for relevant information
-   - Use Claude Sonnet 4.5 to generate an answer
-   - Show you the source documents used
-
-> **Tip:** Click "View Sources" under any answer to see exactly which document chunks were used.
+2. Type your question in the chat input
+3. The system will search your documents and generate an answer
+4. Click "View Sources" to see which document chunks were used
 
 ---
 
 #### Step 4: Manage Your Data
 1. Go to the **"Manage Data"** tab
 2. **Clear Chat History**: Start a fresh conversation
-3. **Clear All Documents**: Remove all indexed documents
+3. **Clear All Documents**: Remove all documents and reset limits
 
 ---
 
-### Configuration Options (Sidebar)
+### Want More?
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| **Search Mode** | How documents are retrieved | Hybrid |
-| **Number of Results** | How many chunks to retrieve | 5 |
-| **Chunk Size** | Size of document chunks | 1000 |
-| **Chunk Overlap** | Overlap between chunks | 200 |
-| **Temperature** | Response creativity (0-1) | 0.7 |
-| **Max Tokens** | Maximum response length | 1000 |
-
----
-
-### Monitoring & Logs
-
-Check your terminal/console for detailed logs showing:
-- Pipeline initialization status
-- Document processing progress
-- Search queries and results
-- LLM generation activity
+This is a limited demo version. The full version includes:
+- ✅ Unlimited documents and queries
+- ✅ Multiple LLM providers (OpenAI, Anthropic)
+- ✅ Advanced prompt templates
+- ✅ Cost tracking and analytics
+- ✅ Pinecone cloud vector store
+- ✅ Enhanced customization options
         """)
 
 
@@ -133,26 +124,46 @@ def render_clear_data():
                 logger.info("Clearing all documents from pipeline")
                 st.session_state.rag_pipeline.clear()
                 st.session_state.documents_loaded = False
+                st.session_state.document_count = 0
                 logger.info("All documents cleared successfully")
-                st.success("All documents cleared")
+                st.success("All documents cleared and limits reset")
                 st.rerun()
 
 
 def main():
     """Main application entry point."""
     logger.info("=" * 60)
-    logger.info("STREAMLIT RAG KIT - APPLICATION STARTING")
+    logger.info("RAG STARTER KIT - DEMO VERSION")
     logger.info("=" * 60)
     logger.info("Model: Claude Sonnet 4.5")
     logger.info("Provider: Anthropic")
-    logger.info("Architecture: Modular Components")
+    logger.info("Version: Demo (3 docs, 10 queries)")
 
     # Initialize session state
     init_session_state()
 
-    # App title
-    st.title("📚 Streamlit RAG Kit")
-    st.caption("Production-Ready RAG powered by Claude Sonnet 4.5")
+    # App title and watermark
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.title("📚 RAG Starter Kit - Demo Version")
+        st.caption("Try out RAG with Claude Sonnet 4.5 • 3 docs • 10 queries")
+    with col2:
+        st.markdown(
+            """
+            <div style='text-align: right; padding-top: 20px;'>
+                <p style='color: #888; font-size: 0.9em; margin: 0;'>
+                    🚀 Powered by<br/>
+                    <strong>RAG Starter Kit</strong>
+                </p>
+                <p style='color: #FF6B6B; font-size: 0.8em; margin-top: 5px;'>
+                    <a href='#' style='color: #FF6B6B; text-decoration: none;'>
+                        Get Full Version →
+                    </a>
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     # Render step-by-step instructions
     render_instructions()
@@ -176,13 +187,26 @@ def main():
     with tab3:
         render_clear_data()
 
-    # Footer
+    # Footer with watermark
     st.divider()
-    st.caption(
-        "Built with Streamlit, ChromaDB, BM25, and Claude Sonnet 4.5 | "
-        "Supports: TXT, PDF, DOCX, XLSX, CSV, JSON | "
-        "Modular Architecture"
-    )
+    footer_col1, footer_col2 = st.columns([2, 1])
+    with footer_col1:
+        st.caption(
+            "Built with Streamlit, ChromaDB, BM25, and Claude Sonnet 4.5 | "
+            "Supports: TXT, PDF, DOCX, XLSX, CSV, JSON"
+        )
+    with footer_col2:
+        st.markdown(
+            """
+            <div style='text-align: right;'>
+                <p style='color: #FF6B6B; font-size: 0.9em; font-weight: bold;'>
+                    Powered by RAG Starter Kit -
+                    <a href='#' style='color: #FF6B6B;'>Get Full Version</a>
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     logger.debug("Main render complete")
 
