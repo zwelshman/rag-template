@@ -354,10 +354,10 @@ def create_pipeline(
     n_results: int,
 ) -> RAGPipeline:
     """
-    Create a new RAG pipeline with OpenAI GPT-4o (Demo version).
+    Create a new RAG pipeline with Anthropic Claude Sonnet 4.5 (Demo version).
 
     Args:
-        api_key: OpenAI API key
+        api_key: Anthropic API key
         search_mode: Search mode string
         chunk_size: Chunk size in characters
         chunk_overlap: Overlap between chunks
@@ -369,8 +369,8 @@ def create_pipeline(
     logger.info("=" * 60)
     logger.info("CREATING NEW RAG PIPELINE (DEMO VERSION)")
     logger.info("=" * 60)
-    logger.info(f"Provider: OpenAI")
-    logger.info(f"Model: gpt-4o")
+    logger.info(f"Provider: Anthropic")
+    logger.info(f"Model: claude-sonnet-4-5")
     logger.info(f"Search Mode: {search_mode}")
     logger.info(f"Chunk Size: {chunk_size}")
     logger.info(f"Chunk Overlap: {chunk_overlap}")
@@ -383,9 +383,9 @@ def create_pipeline(
     }
 
     pipeline = RAGPipeline(
-        llm_provider="openai",
+        llm_provider="anthropic",
         llm_api_key=api_key,
-        llm_model="gpt-4o",
+        llm_model="claude-sonnet-4-5",
         search_mode=mode_map.get(search_mode, SearchMode.HYBRID),
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,

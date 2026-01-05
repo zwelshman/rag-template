@@ -25,16 +25,16 @@ def render_sidebar() -> Tuple[float, int]:
         # LLM Configuration
         st.subheader("LLM Settings")
 
-        # Demo version: OpenAI only
-        st.info("**Model:** GPT-4o (OpenAI)")
-        st.caption("Demo version uses OpenAI's GPT-4o model")
+        # Demo version: Anthropic only
+        st.info("**Model:** Claude Sonnet 4.5 (Anthropic)")
+        st.caption("Demo version uses Anthropic's Claude Sonnet 4.5 model")
 
         # Get API key from secrets or environment
-        api_key = get_api_key("OPENAI_API_KEY")
+        api_key = get_api_key("ANTHROPIC_API_KEY")
         if api_key:
-            st.success("OpenAI API key loaded", icon="✅")
+            st.success("Anthropic API key loaded", icon="✅")
         else:
-            st.warning("⚠️ Please add your OpenAI API key to `.streamlit/secrets.toml`", icon="⚠️")
+            st.warning("⚠️ Please add your Anthropic API key to `.streamlit/secrets.toml`", icon="⚠️")
 
         # Search Configuration
         st.subheader("Search Settings")
@@ -101,7 +101,7 @@ def render_sidebar() -> Tuple[float, int]:
             logger.info("Initialize Pipeline button clicked")
             if not api_key:
                 logger.warning("Pipeline initialization failed: No API key provided")
-                st.error("Please enter your OpenAI API key")
+                st.error("Please enter your Anthropic API key")
             else:
                 try:
                     with st.spinner("Initializing pipeline..."):
@@ -117,7 +117,7 @@ def render_sidebar() -> Tuple[float, int]:
                         st.session_state.llm_configured = True
                         st.session_state.temperature = temperature
                         st.session_state.max_tokens = max_tokens
-                    st.success("Pipeline initialized with GPT-4o!")
+                    st.success("Pipeline initialized with Claude Sonnet 4.5!")
                     logger.info("Pipeline initialization complete - ready for documents")
                 except Exception as e:
                     logger.error(f"Pipeline initialization failed: {e}")

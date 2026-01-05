@@ -52,19 +52,19 @@ Follow these steps to try out the RAG (Retrieval-Augmented Generation) system:
 - **3 documents** maximum per session
 - **10 queries** maximum per session
 - **ChromaDB** vector store (local, no cloud services)
-- **OpenAI GPT-4o** model only
+- **Anthropic Claude Sonnet 4.5** model only
 - Basic chat interface
 
 ---
 
 #### Step 1: Configure Your API Key
 1. Look at the **sidebar on the left**
-2. Add your OpenAI API key to `.streamlit/secrets.toml`
+2. Add your Anthropic API key to `.streamlit/secrets.toml`
 3. Click **"Initialize Pipeline"** to start the system
 
 > **Tip:** Create a file at `.streamlit/secrets.toml` with:
 > ```toml
-> OPENAI_API_KEY = "sk-your-openai-api-key-here"
+> ANTHROPIC_API_KEY = "sk-ant-your-anthropic-api-key-here"
 > ```
 
 ---
@@ -97,7 +97,7 @@ Follow these steps to try out the RAG (Retrieval-Augmented Generation) system:
 
 This is a limited demo version. The full version includes:
 - ✅ Unlimited documents and queries
-- ✅ Multiple LLM providers (Anthropic, OpenAI)
+- ✅ Multiple LLM providers (OpenAI, Anthropic)
 - ✅ Advanced prompt templates
 - ✅ Cost tracking and analytics
 - ✅ Pinecone cloud vector store
@@ -135,8 +135,8 @@ def main():
     logger.info("=" * 60)
     logger.info("RAG STARTER KIT - DEMO VERSION")
     logger.info("=" * 60)
-    logger.info("Model: GPT-4o")
-    logger.info("Provider: OpenAI")
+    logger.info("Model: Claude Sonnet 4.5")
+    logger.info("Provider: Anthropic")
     logger.info("Version: Demo (3 docs, 10 queries)")
 
     # Initialize session state
@@ -146,7 +146,7 @@ def main():
     col1, col2 = st.columns([3, 1])
     with col1:
         st.title("📚 RAG Starter Kit - Demo Version")
-        st.caption("Try out RAG with OpenAI GPT-4o • 3 docs • 10 queries")
+        st.caption("Try out RAG with Claude Sonnet 4.5 • 3 docs • 10 queries")
     with col2:
         st.markdown(
             """
@@ -192,7 +192,7 @@ def main():
     footer_col1, footer_col2 = st.columns([2, 1])
     with footer_col1:
         st.caption(
-            "Built with Streamlit, ChromaDB, BM25, and OpenAI GPT-4o | "
+            "Built with Streamlit, ChromaDB, BM25, and Claude Sonnet 4.5 | "
             "Supports: TXT, PDF, DOCX, XLSX, CSV, JSON"
         )
     with footer_col2:
