@@ -71,6 +71,9 @@ class AnthropicClient(BaseLLMClient):
         logger.info("Sending request to Anthropic API...")
         response = self._client.messages.create(**kwargs)
 
+        if not response.content or len(response.content) == 0:
+            raise ValueError("No response generated from the model")
+
         result = response.content[0].text
         logger.info(f"Response received: {len(result)} chars")
         logger.info(f"  Usage - Input tokens: {response.usage.input_tokens}")

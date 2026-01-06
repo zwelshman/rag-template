@@ -69,7 +69,10 @@ class LLMClient:
         client_class = self.PROVIDERS[provider]
 
         if model is None:
-            model = self.AVAILABLE_MODELS[provider][0]
+            available_models = self.AVAILABLE_MODELS.get(provider, [])
+            if not available_models:
+                raise ValueError(f"No available models for provider: {provider}")
+            model = available_models[0]
             logger.info(f"Using default model: {model}")
 
         self._client = client_class(api_key=api_key, model=model, **kwargs)

@@ -133,6 +133,9 @@ class HuggingFaceClient(BaseLLMClient):
             stream=False,
         )
 
+        if not response.choices or len(response.choices) == 0:
+            raise ValueError("No response generated from the model")
+
         return response.choices[0].message.content
 
     def generate_stream(
@@ -165,5 +168,5 @@ class HuggingFaceClient(BaseLLMClient):
             self.model = used_model
 
         for chunk in stream:
-            if chunk.choices[0].delta.content:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
