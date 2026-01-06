@@ -18,10 +18,10 @@ pip install -r requirements.txt
 Create `.streamlit/secrets.toml`:
 
 ```toml
-ANTHROPIC_API_KEY = "sk-ant-your-api-key-here"
+HF_API_KEY = "hf_your-huggingface-api-key-here"
 ```
 
-Get your API key from [Anthropic Console](https://console.anthropic.com/).
+Get your API key from [Hugging Face Settings](https://huggingface.co/settings/tokens).
 
 ## 3. Run the App
 
@@ -74,4 +74,4 @@ Run `pip install -r requirements.txt` to install all dependencies.
 For issues and questions:
 - Check [Troubleshooting Guide](./troubleshooting.md)
 - Open an issue on GitHub
-- Check Anthropic documentation
+- Check [Hugging Face documentation](https://huggingface.co/docs/huggingface_hub/)
