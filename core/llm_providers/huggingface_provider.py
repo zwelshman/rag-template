@@ -1,7 +1,7 @@
 """
-Groq Provider
-Implementation for Groq's ultra-fast inference with open source models.
-Optimized for low latency responses.
+Hugging Face Provider
+Implementation for Hugging Face Inference API with open source models.
+Optimized for latency with fast, lightweight models.
 """
 
 from typing import Optional, Generator
@@ -9,32 +9,32 @@ import os
 from .base import BaseLLMClient
 
 
-class GroqClient(BaseLLMClient):
-    """Groq API client for fast open source LLM inference."""
+class HuggingFaceClient(BaseLLMClient):
+    """Hugging Face Inference API client for open source LLM inference."""
 
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "llama-3.1-8b-instant",
+        model: str = "mistralai/Mistral-7B-Instruct-v0.3",
     ):
         """
-        Initialize Groq client.
+        Initialize Hugging Face client.
 
         Args:
-            api_key: Groq API key (defaults to GROQ_API_KEY env var)
-            model: Model to use (default: llama-3.1-8b-instant for lowest latency)
+            api_key: Hugging Face API token (defaults to HF_API_KEY or HUGGINGFACE_API_KEY env var)
+            model: Model to use (default: Mistral-7B-Instruct for good latency/quality balance)
         """
         try:
-            from groq import Groq
+            from huggingface_hub import InferenceClient
         except ImportError:
-            raise ImportError("groq is required. Install with: pip install groq")
+            raise ImportError("huggingface_hub is required. Install with: pip install huggingface_hub")
 
-        self.api_key = api_key or os.environ.get("GROQ_API_KEY")
+        self.api_key = api_key or os.environ.get("HF_API_KEY") or os.environ.get("HUGGINGFACE_API_KEY")
         if not self.api_key:
-            raise ValueError("Groq API key is required")
+            raise ValueError("Hugging Face API key is required")
 
         self.model = model
-        self._client = Groq(api_key=self.api_key)
+        self._client = InferenceClient(token=self.api_key)
 
     def generate(
         self,
@@ -43,7 +43,7 @@ class GroqClient(BaseLLMClient):
         temperature: float = 0.7,
         max_tokens: int = 1000,
     ) -> str:
-        """Generate a response from Groq."""
+        """Generate a response from Hugging Face."""
         messages = []
 
         if system_prompt:
@@ -51,7 +51,7 @@ class GroqClient(BaseLLMClient):
 
         messages.append({"role": "user", "content": prompt})
 
-        response = self._client.chat.completions.create(
+        response = self._client.chat_completion(
             model=self.model,
             messages=messages,
             temperature=temperature,
@@ -67,7 +67,7 @@ class GroqClient(BaseLLMClient):
         temperature: float = 0.7,
         max_tokens: int = 1000,
     ) -> Generator[str, None, None]:
-        """Generate a streaming response from Groq."""
+        """Generate a streaming response from Hugging Face."""
         messages = []
 
         if system_prompt:
@@ -75,7 +75,7 @@ class GroqClient(BaseLLMClient):
 
         messages.append({"role": "user", "content": prompt})
 
-        stream = self._client.chat.completions.create(
+        stream = self._client.chat_completion(
             model=self.model,
             messages=messages,
             temperature=temperature,

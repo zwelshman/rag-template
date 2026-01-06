@@ -8,28 +8,28 @@ import logging
 from .base import BaseLLMClient
 from .openai_provider import OpenAIClient
 from .anthropic_provider import AnthropicClient
-from .groq_provider import GroqClient
+from .huggingface_provider import HuggingFaceClient
 
 logger = logging.getLogger("rag_app.llm.factory")
 
 
 class LLMClient:
     """
-    Unified LLM client using Groq with Llama 3.1 (optimized for latency).
+    Unified LLM client using Hugging Face with open source models (optimized for latency).
     Factory class for creating appropriate LLM client based on provider.
     """
 
     PROVIDERS = {
-        "groq": GroqClient,
+        "huggingface": HuggingFaceClient,
         "openai": OpenAIClient,
         "anthropic": AnthropicClient,
     }
 
     AVAILABLE_MODELS = {
-        "groq": [
-            "llama-3.1-8b-instant",  # Fastest - optimized for latency
-            "llama-3.3-70b-versatile",  # Larger, more capable
-            "mixtral-8x7b-32768",  # Good balance of speed and capability
+        "huggingface": [
+            "mistralai/Mistral-7B-Instruct-v0.3",  # Fast, good quality
+            "meta-llama/Llama-3.2-3B-Instruct",  # Smallest, fastest
+            "microsoft/Phi-3-mini-4k-instruct",  # Compact, efficient
         ],
         "openai": [
             "gpt-4o",
@@ -45,7 +45,7 @@ class LLMClient:
 
     def __init__(
         self,
-        provider: str = "groq",
+        provider: str = "huggingface",
         api_key: Optional[str] = None,
         model: Optional[str] = None,
         **kwargs,
@@ -54,7 +54,7 @@ class LLMClient:
         Initialize unified LLM client.
 
         Args:
-            provider: LLM provider ('groq', 'openai', or 'anthropic')
+            provider: LLM provider ('huggingface', 'openai', or 'anthropic')
             api_key: API key for the provider
             model: Model name (uses provider default if not specified)
             **kwargs: Additional arguments passed to the provider client

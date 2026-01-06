@@ -63,7 +63,7 @@ in the provided documents."""
 
     def __init__(
         self,
-        llm_provider: str = "groq",
+        llm_provider: str = "huggingface",
         llm_api_key: Optional[str] = None,
         llm_model: Optional[str] = None,
         collection_name: str = "rag_documents",
@@ -78,7 +78,7 @@ in the provided documents."""
         Initialize the RAG pipeline.
 
         Args:
-            llm_provider: LLM provider ('groq', 'openai', or 'anthropic')
+            llm_provider: LLM provider ('huggingface', 'openai', or 'anthropic')
             llm_api_key: API key for the LLM provider
             llm_model: Model name for the LLM
             collection_name: Name for the ChromaDB collection
@@ -354,10 +354,10 @@ def create_pipeline(
     n_results: int,
 ) -> RAGPipeline:
     """
-    Create a new RAG pipeline with Groq Llama 3.1 (optimized for latency).
+    Create a new RAG pipeline with Hugging Face Mistral 7B (optimized for latency).
 
     Args:
-        api_key: Groq API key
+        api_key: Hugging Face API key
         search_mode: Search mode string
         chunk_size: Chunk size in characters
         chunk_overlap: Overlap between chunks
@@ -369,8 +369,8 @@ def create_pipeline(
     logger.info("=" * 60)
     logger.info("CREATING NEW RAG PIPELINE")
     logger.info("=" * 60)
-    logger.info(f"Provider: Groq")
-    logger.info(f"Model: llama-3.1-8b-instant")
+    logger.info(f"Provider: Hugging Face")
+    logger.info(f"Model: mistralai/Mistral-7B-Instruct-v0.3")
     logger.info(f"Search Mode: {search_mode}")
     logger.info(f"Chunk Size: {chunk_size}")
     logger.info(f"Chunk Overlap: {chunk_overlap}")
@@ -383,9 +383,9 @@ def create_pipeline(
     }
 
     pipeline = RAGPipeline(
-        llm_provider="groq",
+        llm_provider="huggingface",
         llm_api_key=api_key,
-        llm_model="llama-3.1-8b-instant",
+        llm_model="mistralai/Mistral-7B-Instruct-v0.3",
         search_mode=mode_map.get(search_mode, SearchMode.HYBRID),
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
