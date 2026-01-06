@@ -130,12 +130,27 @@ class ChromaVectorStore(BaseVectorStore):
         formatted_results = []
         if results['documents'] and results['documents'][0]:
             for i, doc in enumerate(results['documents'][0]):
+                # Safely access nested lists with bounds checking
+                metadata = {}
+                if results.get('metadatas') and len(results['metadatas']) > 0 and len(results['metadatas'][0]) > i:
+                    metadata = results['metadatas'][0][i]
+
+                distance = None
+                if results.get('distances') and len(results['distances']) > 0 and len(results['distances'][0]) > i:
+                    distance = results['distances'][0][i]
+
+                doc_id = None
+                if results.get('ids') and len(results['ids']) > 0 and len(results['ids'][0]) > i:
+                    doc_id = results['ids'][0][i]
+
+                score = 1 - distance if distance is not None else None
+
                 formatted_results.append({
                     'content': doc,
-                    'metadata': results['metadatas'][0][i] if results['metadatas'] else {},
-                    'distance': results['distances'][0][i] if results['distances'] else None,
-                    'score': 1 - results['distances'][0][i] if results['distances'] else None,
-                    'id': results['ids'][0][i] if results['ids'] else None,
+                    'metadata': metadata,
+                    'distance': distance,
+                    'score': score,
+                    'id': doc_id,
                 })
 
         return formatted_results
