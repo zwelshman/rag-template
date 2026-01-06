@@ -25,9 +25,9 @@ def render_sidebar() -> Tuple[float, int]:
         # LLM Configuration
         st.subheader("LLM Settings")
 
-        # Default: Hugging Face with Mistral 7B (optimized for latency)
-        st.info("**Model:** Mistral 7B Instruct (Hugging Face)")
-        st.caption("Using Hugging Face Inference API with open source Mistral 7B")
+        # Default: Hugging Face with Llama 3.1 (optimized for latency)
+        st.info("**Model:** Meta Llama 3.1 8B Instruct (Hugging Face)")
+        st.caption("Using Hugging Face Inference API with open source Llama 3.1")
 
         # Get API key from secrets or environment
         api_key = get_api_key("HF_API_KEY")
@@ -117,7 +117,7 @@ def render_sidebar() -> Tuple[float, int]:
                         st.session_state.llm_configured = True
                         st.session_state.temperature = temperature
                         st.session_state.max_tokens = max_tokens
-                    st.success("Pipeline initialized with Mistral 7B Instruct!")
+                    st.success("Pipeline initialized with Meta Llama 3.1!")
                     logger.info("Pipeline initialization complete - ready for documents")
                 except Exception as e:
                     logger.error(f"Pipeline initialization failed: {e}")

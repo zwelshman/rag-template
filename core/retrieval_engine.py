@@ -354,7 +354,7 @@ def create_pipeline(
     n_results: int,
 ) -> RAGPipeline:
     """
-    Create a new RAG pipeline with Hugging Face Mistral 7B (optimized for latency).
+    Create a new RAG pipeline with Hugging Face Meta Llama 3.1 (optimized for latency).
 
     Args:
         api_key: Hugging Face API key
@@ -370,7 +370,7 @@ def create_pipeline(
     logger.info("CREATING NEW RAG PIPELINE")
     logger.info("=" * 60)
     logger.info(f"Provider: Hugging Face")
-    logger.info(f"Model: mistralai/Mistral-7B-Instruct-v0.3")
+    logger.info(f"Model: meta-llama/Meta-Llama-3.1-8B-Instruct")
     logger.info(f"Search Mode: {search_mode}")
     logger.info(f"Chunk Size: {chunk_size}")
     logger.info(f"Chunk Overlap: {chunk_overlap}")
@@ -385,7 +385,7 @@ def create_pipeline(
     pipeline = RAGPipeline(
         llm_provider="huggingface",
         llm_api_key=api_key,
-        llm_model="mistralai/Mistral-7B-Instruct-v0.3",
+        llm_model="meta-llama/Meta-Llama-3.1-8B-Instruct",
         search_mode=mode_map.get(search_mode, SearchMode.HYBRID),
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
