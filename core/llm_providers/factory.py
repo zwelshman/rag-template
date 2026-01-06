@@ -8,22 +8,29 @@ import logging
 from .base import BaseLLMClient
 from .openai_provider import OpenAIClient
 from .anthropic_provider import AnthropicClient
+from .groq_provider import GroqClient
 
 logger = logging.getLogger("rag_app.llm.factory")
 
 
 class LLMClient:
     """
-    Unified LLM client using Anthropic Claude Sonnet 4.5.
+    Unified LLM client using Groq with Llama 3.1 (optimized for latency).
     Factory class for creating appropriate LLM client based on provider.
     """
 
     PROVIDERS = {
+        "groq": GroqClient,
         "openai": OpenAIClient,
         "anthropic": AnthropicClient,
     }
 
     AVAILABLE_MODELS = {
+        "groq": [
+            "llama-3.1-8b-instant",  # Fastest - optimized for latency
+            "llama-3.3-70b-versatile",  # Larger, more capable
+            "mixtral-8x7b-32768",  # Good balance of speed and capability
+        ],
         "openai": [
             "gpt-4o",
             "gpt-4o-mini",
@@ -38,7 +45,7 @@ class LLMClient:
 
     def __init__(
         self,
-        provider: str = "anthropic",
+        provider: str = "groq",
         api_key: Optional[str] = None,
         model: Optional[str] = None,
         **kwargs,
@@ -47,7 +54,7 @@ class LLMClient:
         Initialize unified LLM client.
 
         Args:
-            provider: LLM provider ('openai' or 'anthropic')
+            provider: LLM provider ('groq', 'openai', or 'anthropic')
             api_key: API key for the provider
             model: Model name (uses provider default if not specified)
             **kwargs: Additional arguments passed to the provider client
