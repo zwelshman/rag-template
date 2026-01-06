@@ -8,22 +8,29 @@ import logging
 from .base import BaseLLMClient
 from .openai_provider import OpenAIClient
 from .anthropic_provider import AnthropicClient
+from .huggingface_provider import HuggingFaceClient
 
 logger = logging.getLogger("rag_app.llm.factory")
 
 
 class LLMClient:
     """
-    Unified LLM client using Anthropic Claude Sonnet 4.5.
+    Unified LLM client using Hugging Face with open source models (optimized for latency).
     Factory class for creating appropriate LLM client based on provider.
     """
 
     PROVIDERS = {
+        "huggingface": HuggingFaceClient,
         "openai": OpenAIClient,
         "anthropic": AnthropicClient,
     }
 
     AVAILABLE_MODELS = {
+        "huggingface": [
+            "mistralai/Mistral-7B-Instruct-v0.3",  # Fast, good quality
+            "meta-llama/Llama-3.2-3B-Instruct",  # Smallest, fastest
+            "microsoft/Phi-3-mini-4k-instruct",  # Compact, efficient
+        ],
         "openai": [
             "gpt-4o",
             "gpt-4o-mini",
@@ -38,7 +45,7 @@ class LLMClient:
 
     def __init__(
         self,
-        provider: str = "anthropic",
+        provider: str = "huggingface",
         api_key: Optional[str] = None,
         model: Optional[str] = None,
         **kwargs,
@@ -47,7 +54,7 @@ class LLMClient:
         Initialize unified LLM client.
 
         Args:
-            provider: LLM provider ('openai' or 'anthropic')
+            provider: LLM provider ('huggingface', 'openai', or 'anthropic')
             api_key: API key for the provider
             model: Model name (uses provider default if not specified)
             **kwargs: Additional arguments passed to the provider client
