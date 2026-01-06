@@ -6,7 +6,7 @@ This guide will walk you through deploying your Streamlit RAG Kit to Streamlit C
 
 - A GitHub account
 - Your repository pushed to GitHub
-- An Anthropic API key
+- A Hugging Face API key
 
 ## Step-by-Step Deployment
 
@@ -38,7 +38,7 @@ git push origin main
 2. Add your API key:
 
 ```toml
-ANTHROPIC_API_KEY = "sk-ant-your-api-key-here"
+HF_API_KEY = "hf_your-huggingface-api-key-here"
 ```
 
 3. Save the secrets
@@ -74,7 +74,7 @@ Add to your `requirements.txt`:
 ```txt
 # Keep dependencies minimal
 streamlit>=1.28.0
-anthropic>=0.7.0
+huggingface_hub>=0.20.0
 chromadb>=0.4.18
 # ... other essential packages
 ```
@@ -103,7 +103,7 @@ chromadb>=0.4.18
 
 - View app usage in Streamlit Cloud dashboard
 - Check logs for errors
-- Monitor API usage in Anthropic console
+- Monitor API usage in Hugging Face dashboard
 
 ## Next Steps
 

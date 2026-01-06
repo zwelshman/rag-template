@@ -27,8 +27,8 @@ class LLMClient:
 
     AVAILABLE_MODELS = {
         "huggingface": [
-            "mistralai/Mistral-7B-Instruct-v0.3",  # Fast, good quality
-            "meta-llama/Llama-3.2-3B-Instruct",  # Smallest, fastest
+            "meta-llama/Meta-Llama-3.1-8B-Instruct",  # Fast, good quality (default)
+            "Qwen/Qwen2.5-7B-Instruct",  # Good alternative
             "microsoft/Phi-3-mini-4k-instruct",  # Compact, efficient
         ],
         "openai": [

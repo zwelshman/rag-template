@@ -1,6 +1,6 @@
 # 📚 Streamlit RAG Kit
 
-A production-ready, modular Retrieval-Augmented Generation (RAG) application powered by **Claude Sonnet 4.5**, built with Streamlit.
+A production-ready, modular Retrieval-Augmented Generation (RAG) application powered by **Meta Llama 3.1** via Hugging Face, built with Streamlit.
 
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://document-search-template.streamlit.app/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -9,7 +9,8 @@ A production-ready, modular Retrieval-Augmented Generation (RAG) application pow
 ## ✨ Features
 
 - 🚀 **Production-Ready**: Modular architecture with separation of concerns
-- 🧠 **Powered by Claude Sonnet 4.5**: State-of-the-art LLM for generation
+- 🧠 **Powered by Meta Llama 3.1**: Open source LLM via Hugging Face Inference API
+- 🔄 **Automatic Fallback**: Gracefully handles deprecated models with fallback support
 - 📁 **Multi-Format Support**: PDF, DOCX, TXT, CSV, XLSX, JSON
 - 🔍 **Hybrid Search**: Combines vector similarity and BM25 keyword search
 - 💬 **Streaming Responses**: Real-time response generation
@@ -35,8 +36,9 @@ streamlit-rag-kit/
 │   │   └── chroma.py                 # ChromaDB (default)
 │   ├── llm_providers/                # LLM integrations
 │   │   ├── base.py                   # Base interface
-│   │   ├── anthropic_provider.py     # Anthropic (default)
+│   │   ├── huggingface_provider.py   # Hugging Face (default)
 │   │   ├── openai_provider.py        # OpenAI support
+│   │   ├── anthropic_provider.py     # Anthropic support
 │   │   └── factory.py                # Provider factory
 │   ├── document_processor.py         # Document loading & chunking
 │   └── retrieval_engine.py           # Main RAG pipeline
@@ -79,10 +81,10 @@ pip install -r requirements.txt
 Create `.streamlit/secrets.toml`:
 
 ```toml
-ANTHROPIC_API_KEY = "sk-ant-your-api-key-here"
+HF_API_KEY = "hf_your-huggingface-api-key-here"
 ```
 
-Get your API key from [Anthropic Console](https://console.anthropic.com/).
+Get your API key from [Hugging Face Settings](https://huggingface.co/settings/tokens).
 
 ### 3. Run the App
 
@@ -132,9 +134,9 @@ from utils.rag_pipeline import SearchMode
 
 # Initialize the pipeline
 pipeline = RAGPipeline(
-    llm_provider="openai",
-    llm_api_key="your-api-key",
-    llm_model="gpt-4o-mini",
+    llm_provider="huggingface",
+    llm_api_key="your-hf-api-key",
+    llm_model="meta-llama/Meta-Llama-3.1-8B-Instruct",
     search_mode=SearchMode.HYBRID,
     chunk_size=1000,
     chunk_overlap=200,
@@ -194,8 +196,9 @@ Combines both methods using Reciprocal Rank Fusion. Benefits:
 - **python-docx**: Word document parsing
 - **openpyxl**: Excel file parsing
 - **pandas**: Data manipulation
-- **openai**: OpenAI API client
-- **anthropic**: Anthropic API client
+- **huggingface_hub**: Hugging Face Inference API (default)
+- **openai**: OpenAI API client (optional)
+- **anthropic**: Anthropic API client (optional)
 
 ## 🎯 Use Cases
 
@@ -228,4 +231,4 @@ MIT License
 
 ---
 
-Made with ❤️ using Claude Sonnet 4.5
+Made with ❤️ using Meta Llama 3.1 via Hugging Face
