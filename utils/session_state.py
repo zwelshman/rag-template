@@ -29,6 +29,10 @@ def init_session_state():
         st.session_state.llm_configured = False
         logger.debug("Session state: llm_configured initialized to False")
 
+    if 'selected_model' not in st.session_state:
+        st.session_state.selected_model = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+        logger.debug("Session state: selected_model initialized to Meta-Llama-3.1-8B-Instruct")
+
     # Demo version limits
     if 'document_count' not in st.session_state:
         st.session_state.document_count = 0
@@ -61,3 +65,4 @@ def reset_session():
     st.session_state.chat_history = []
     st.session_state.documents_loaded = False
     st.session_state.llm_configured = False
+    st.session_state.selected_model = "meta-llama/Meta-Llama-3.1-8B-Instruct"

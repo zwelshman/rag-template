@@ -1,6 +1,6 @@
 """
 Streamlit RAG Kit - Main Application
-A modular, production-ready RAG application powered by Claude Sonnet 4.5.
+A modular, production-ready RAG application powered by Meta Llama 3.1 8B Instruct.
 """
 
 import streamlit as st
@@ -52,7 +52,7 @@ Follow these steps to try out the RAG (Retrieval-Augmented Generation) system:
 - **3 documents** maximum per session
 - **10 queries** maximum per session
 - **ChromaDB** vector store (local, no cloud services)
-- **Anthropic Claude Sonnet 4.5** model only
+- **Meta Llama 3.1 8B Instruct** (Hugging Face) - with model selection dropdown
 - Basic chat interface
 
 ---
@@ -135,8 +135,8 @@ def main():
     logger.info("=" * 60)
     logger.info("RAG STARTER KIT - DEMO VERSION")
     logger.info("=" * 60)
-    logger.info("Model: Claude Sonnet 4.5")
-    logger.info("Provider: Anthropic")
+    logger.info("Model: Meta Llama 3.1 8B Instruct (Hugging Face)")
+    logger.info("Provider: Hugging Face")
     logger.info("Version: Demo (3 docs, 10 queries)")
 
     # Initialize session state
@@ -146,7 +146,7 @@ def main():
     col1, col2 = st.columns([3, 1])
     with col1:
         st.title("📚 RAG Starter Kit - Demo Version")
-        st.caption("Try out RAG with Claude Sonnet 4.5 • 3 docs • 10 queries")
+        st.caption("Try out RAG with Meta Llama 3.1 8B Instruct (Hugging Face) • 3 docs • 10 queries")
     with col2:
         st.markdown(
             """
@@ -192,7 +192,7 @@ def main():
     footer_col1, footer_col2 = st.columns([2, 1])
     with footer_col1:
         st.caption(
-            "Built with Streamlit, ChromaDB, BM25, and Claude Sonnet 4.5 | "
+            "Built with Streamlit, ChromaDB, BM25, and Meta Llama 3.1 (Hugging Face) | "
             "Supports: TXT, PDF, DOCX, XLSX, CSV, JSON"
         )
     with footer_col2:

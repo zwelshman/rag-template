@@ -7,6 +7,7 @@ import streamlit as st
 import logging
 from typing import Tuple, Optional
 from core.retrieval_engine import create_pipeline, SearchMode
+from core.llm_providers.factory import LLMClient
 from utils.auth import get_api_key
 
 logger = logging.getLogger("rag_app.components.settings_panel")
@@ -25,9 +26,33 @@ def render_sidebar() -> Tuple[float, int]:
         # LLM Configuration
         st.subheader("LLM Settings")
 
-        # Default: Hugging Face with Llama 3.1 (optimized for latency)
-        st.info("**Model:** Meta Llama 3.1 8B Instruct (Hugging Face)")
-        st.caption("Using Hugging Face Inference API with open source Llama 3.1")
+        # Model selection dropdown
+        available_models = LLMClient.get_available_models("huggingface")
+
+        # Display-friendly model names
+        model_display_names = {
+            "meta-llama/Meta-Llama-3.1-8B-Instruct": "Meta Llama 3.1 8B Instruct (Hugging Face)",
+            "Qwen/Qwen2.5-7B-Instruct": "Qwen 2.5 7B Instruct",
+            "microsoft/Phi-3-mini-4k-instruct": "Microsoft Phi-3 Mini 4K Instruct",
+        }
+
+        display_options = [model_display_names.get(m, m) for m in available_models]
+
+        selected_display = st.selectbox(
+            "Select LLM Model",
+            options=display_options,
+            index=0,
+            help="Choose the language model for generating responses",
+        )
+
+        # Map back to actual model name
+        reverse_map = {v: k for k, v in model_display_names.items()}
+        selected_model = reverse_map.get(selected_display, available_models[0])
+
+        # Store selected model in session state
+        st.session_state.selected_model = selected_model
+
+        st.caption("Using Hugging Face Inference API with open source models")
 
         # Get API key from secrets or environment
         api_key = get_api_key("HF_API_KEY")
@@ -105,19 +130,20 @@ def render_sidebar() -> Tuple[float, int]:
             else:
                 try:
                     with st.spinner("Initializing pipeline..."):
-                        logger.info("Starting pipeline initialization...")
+                        logger.info(f"Starting pipeline initialization with model: {selected_model}")
                         pipeline = create_pipeline(
                             api_key=api_key,
                             search_mode=search_mode,
                             chunk_size=chunk_size,
                             chunk_overlap=chunk_overlap,
                             n_results=n_results,
+                            llm_model=selected_model,
                         )
                         st.session_state.rag_pipeline = pipeline
                         st.session_state.llm_configured = True
                         st.session_state.temperature = temperature
                         st.session_state.max_tokens = max_tokens
-                    st.success("Pipeline initialized with Meta Llama 3.1!")
+                    st.success(f"Pipeline initialized with {selected_display}!")
                     logger.info("Pipeline initialization complete - ready for documents")
                 except Exception as e:
                     logger.error(f"Pipeline initialization failed: {e}")
