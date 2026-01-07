@@ -352,9 +352,10 @@ def create_pipeline(
     chunk_size: int,
     chunk_overlap: int,
     n_results: int,
+    llm_model: str = "meta-llama/Meta-Llama-3.1-8B-Instruct",
 ) -> RAGPipeline:
     """
-    Create a new RAG pipeline with Hugging Face Meta Llama 3.1 (optimized for latency).
+    Create a new RAG pipeline with Hugging Face models.
 
     Args:
         api_key: Hugging Face API key
@@ -362,6 +363,7 @@ def create_pipeline(
         chunk_size: Chunk size in characters
         chunk_overlap: Overlap between chunks
         n_results: Number of results to retrieve
+        llm_model: LLM model to use (default: Meta Llama 3.1 8B Instruct)
 
     Returns:
         Initialized RAGPipeline
@@ -370,7 +372,7 @@ def create_pipeline(
     logger.info("CREATING NEW RAG PIPELINE")
     logger.info("=" * 60)
     logger.info(f"Provider: Hugging Face")
-    logger.info(f"Model: meta-llama/Meta-Llama-3.1-8B-Instruct")
+    logger.info(f"Model: {llm_model}")
     logger.info(f"Search Mode: {search_mode}")
     logger.info(f"Chunk Size: {chunk_size}")
     logger.info(f"Chunk Overlap: {chunk_overlap}")
@@ -385,7 +387,7 @@ def create_pipeline(
     pipeline = RAGPipeline(
         llm_provider="huggingface",
         llm_api_key=api_key,
-        llm_model="meta-llama/Meta-Llama-3.1-8B-Instruct",
+        llm_model=llm_model,
         search_mode=mode_map.get(search_mode, SearchMode.HYBRID),
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
