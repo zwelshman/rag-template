@@ -156,7 +156,7 @@ def main():
                     <strong>RAG Starter Kit</strong>
                 </p>
                 <p style='color: #FF6B6B; font-size: 0.8em; margin-top: 5px;'>
-                    <a href='#' style='color: #FF6B6B; text-decoration: none;'>
+                    <a href='https://zmswelshman.gumroad.com/l/rag-knowledge-base' target='_blank' style='color: #FF6B6B; text-decoration: none;'>
                         Get Full Version →
                     </a>
                 </p>
