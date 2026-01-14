@@ -197,17 +197,21 @@ def main():
         )
     with footer_col2:
         st.markdown(
-            """
-            <div style='text-align: right;'>
-                <p style='color: #FF6B6B; font-size: 0.9em; font-weight: bold;'>
-                    Powered by RAG Starter Kit -
-                    <a href='#' style='color: #FF6B6B;'>Get Full Version</a>
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
+    """
+    <div style='text-align: right; padding-top: 20px;'>
+        <p style='color: #888; font-size: 0.9em; margin: 0;'>
+            🚀 Powered by<br/>
+            <strong>RAG Starter Kit</strong>
+        </p>
+        <p style='color: #FF6B6B; font-size: 0.8em; margin-top: 5px;'>
+            <a href='https://zmswelshman.gumroad.com/l/rag-knowledge-base' target='_blank' style='color: #FF6B6B; text-decoration: none;'>
+                Get Full Version →
+            </a>
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
     logger.debug("Main render complete")
 
 
